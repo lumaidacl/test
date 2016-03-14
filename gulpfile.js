@@ -18,6 +18,8 @@ var gulp = require('gulp'),
       'bb >= 10'
     ];
 
+var modRewrite  = require('connect-modrewrite');
+
 gulp.task('clean', function(){
     return del(config.files.cleanPaths);
 });
@@ -61,7 +63,14 @@ gulp.task('server', ['styles','concat-js','concat-css','clean'], function () {
   browserSync({
     notify: false,
     logPrefix: 'Initial Layout',
-    server: config.app.server
+    server: {
+      baseDir: config.app.server,
+      middleware: [
+          modRewrite([
+              '!\\.\\w+$ /index.html [L]'
+          ])
+      ]
+    }
   });
 
   gulp.watch(config.files.watch.html, reload);
