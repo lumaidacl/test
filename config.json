@@ -8,7 +8,8 @@
 			],
 			"jsHintReporter" : "jshint-stylish",
 			"tmpDirectory" : ".temporal/static/js",
-			"concat" : "all.min.js"
+			"concat" : "all.min.js",
+			"entry": "app/static/js/entry.js"
 		},
 		"css" :
 		{

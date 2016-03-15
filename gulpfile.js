@@ -5,6 +5,8 @@ var gulp = require('gulp'),
     del = require('del'),
     config = require('./config.json'),
     reload = browserSync.reload,
+    modRewrite  = require('connect-modrewrite'),
+    webpack = require('webpack-stream'),
     $ = gulpPlugins,
     AUTOPREFIXER_BROWSERS = [
       'ie >= 10',
@@ -17,8 +19,6 @@ var gulp = require('gulp'),
       'android >= 4.4',
       'bb >= 10'
     ];
-
-var modRewrite  = require('connect-modrewrite');
 
 gulp.task('clean', function(){
     return del(config.files.cleanPaths);
@@ -51,6 +51,17 @@ gulp.task('concat-js', function(){
     .pipe($.size({title: 'Concat JS size'}));
 });
 
+gulp.task('webpack', function() {
+  return gulp.src(config.app.js.entry)
+          .pipe(webpack({
+            output: {
+              filename: 'bundle.js'
+            },
+            devtool: 'source-map'
+          }))
+          .pipe(gulp.dest(config.app.js.tmpDirectory));
+});
+
 gulp.task('concat-css', function(){
   return gulp.src(config.files.concat.css)
     .pipe($.changed(config.app.css.tmpDirectory, {extension: '.css'}))
@@ -59,8 +70,9 @@ gulp.task('concat-css', function(){
     .pipe($.size({title: 'Concat CSS size'}));
 });
 
-gulp.task('server', ['styles','concat-js','concat-css','clean'], function () {
+gulp.task('server', ['styles','webpack','concat-css','clean'], function () {
   browserSync({
+    open: false,
     notify: false,
     logPrefix: 'Initial Layout',
     server: {
@@ -75,7 +87,7 @@ gulp.task('server', ['styles','concat-js','concat-css','clean'], function () {
 
   gulp.watch(config.files.watch.html, reload);
   gulp.watch(config.files.watch.styles, ['styles', reload]);
-  gulp.watch(config.files.watch.js, ['jshint',reload]);
+  gulp.watch(config.files.watch.js, ['jshint', 'webpack',reload]);
   gulp.watch(config.files.watch.img, reload);
 });
 
