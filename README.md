@@ -20,6 +20,7 @@ The configuration of the paths are in the file `config.json`
 
 - Clone the repository
 - Install gulp globally: `npm install gulp -g`
-- Instal dependencies for the project: `npm install`
-- Run server: `gulp server`
-- Create production files: `gulp server:deploy`
+- Install dependencies for the project: `npm install`
+- Run server: `npm start`
+- You could access to development server: `http://localhost:3000`
+- You could access to browsersync area: `http://localhost:3001`
