@@ -7,33 +7,27 @@
 				"app/static/js/*.js"
 			],
 			"jsHintReporter" : "jshint-stylish",
-			"tmpDirectory" : ".temporal/static/js",
-			"concat" : "all.min.js",
-			"entry": "app/static/js/entry.js"
+			"tmpDirectory" : ".temporal/app",
+			"entry": "client/app/entry.js"
 		},
 		"css" :
 		{
 			"sources" : [
-    			"app/static/css/*.styl",
-    			"app/static/css/*.css",
-				"!app/static/css/_*.styl"
+    			"client/css/*.styl",
+					"!client/css/_*.styl"
   			],
-			"tmpDirectory" : ".temporal/static/css",
-			"concat" : "all.min.css"
+			"tmpDirectory" : ".temporal/css",
+			"entry" : "client/css/main.styl"
 		},
-		"server" : [".temporal", "app"]
+		"server" : [".temporal", "client"]
 	},
 	"deploy" :
 	{
 		"from" :
 		[
-			"app/**",
-			"!app/static/js/{concat,concat/**}",
-			"!app/static/css/{concat,concat/**}",
-			"!app/static/css/**/*.{styl,scss}",
-			"!app/{vendor,vendor/**}",
-			".temporal/**",
-			"!app/.bowerrc"
+			".temporal/css/main.css",
+			".temporal/app/bundle.js",
+			"client/**/*.html"
 		],
 		"to" : "deploy",
 		"server" : ["deploy"]
@@ -46,15 +40,10 @@
 		],
 		"watch":
 		{
-			"html" : ["app/**/*.html"],
-			"styles" : ["app/static/css/**/*.{styl,css}"],
-			"js" : ["app/static/js/**/*.js"],
-			"img" : ["app/static/images/**/*"]
-		},
-		"concat" :
-		{
-			"js":"",
-			"css":""
+			"html" : ["client/**/*.html"],
+			"styles" : ["client/css/**/*.{styl,css}"],
+			"js" : ["client/app/**/*.js"],
+			"img" : ["client/images/**/*"]
 		}
 	}
 }

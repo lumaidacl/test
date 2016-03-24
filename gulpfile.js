@@ -5,7 +5,6 @@ var gulp = require('gulp'),
     del = require('del'),
     config = require('./config.json'),
     reload = browserSync.reload,
-    modRewrite  = require('connect-modrewrite'),
     webpack = require('webpack-stream'),
     $ = gulpPlugins,
     AUTOPREFIXER_BROWSERS = [
@@ -33,22 +32,13 @@ gulp.task('jshint', function () {
 });
 
 gulp.task('styles', ['clean'],function () {
-  return gulp.src(config.app.css.sources)
+  return gulp.src(config.app.css.entry)
     .pipe($.sourcemaps.init())
-    .pipe($.changed(config.app.css.tmpDirectory, {extension: '.css'}))
     .pipe($.stylus())
     .pipe($.autoprefixer({browsers: AUTOPREFIXER_BROWSERS}))
     .pipe($.sourcemaps.write())
     .pipe(gulp.dest(config.app.css.tmpDirectory))
     .pipe($.size({title: 'Styles'}));
-});
-
-gulp.task('concat-js', function(){
-  return gulp.src(config.files.concat.js)
-    .pipe($.changed(config.app.js.tmpDirectory, {extension: '.js'}))
-    .pipe($.if('*.js', $.concat( config.app.js.concat )))
-    .pipe($.if('*.js',gulp.dest(config.app.js.tmpDirectory)))
-    .pipe($.size({title: 'Concat JS size'}));
 });
 
 gulp.task('webpack', function() {
@@ -70,18 +60,19 @@ gulp.task('concat-css', function(){
     .pipe($.size({title: 'Concat CSS size'}));
 });
 
-gulp.task('server', ['styles','webpack','concat-css','clean'], function () {
+gulp.task('server', ['styles','webpack','clean'], function () {
   browserSync({
     open: false,
     notify: false,
     logPrefix: 'Initial Layout',
     server: {
       baseDir: config.app.server,
-      middleware: [
-          modRewrite([
-              '!\\.\\w+$ /index.html [L]'
-          ])
-      ]
+      middleware: function(req, res, next) {
+        if(/\S\.{1}(jpg|jpeg|png|svg|css|js|map|ttf|eot|woff|html)/.test(req.url) !== true){
+          req.url = '/index.html';
+        }
+        return next();
+      }
     }
   });
 
@@ -91,7 +82,7 @@ gulp.task('server', ['styles','webpack','concat-css','clean'], function () {
   gulp.watch(config.files.watch.img, reload);
 });
 
-gulp.task('server:deploy', ['clean'],function () {
+gulp.task('deploy-files', ['clean'],function () {
   return gulp.src(config.deploy.from, {
     dot: true
   }).pipe(gulp.dest(config.deploy.to))
@@ -99,6 +90,22 @@ gulp.task('server:deploy', ['clean'],function () {
     .pipe($.if('**/*.css', $.csso()))
     .pipe($.if('**/*.js', $.uglify({preserveComments: 'some'})))
     .pipe(gulp.dest(config.deploy.to));
+});
+
+gulp.task('server:deploy', ['deploy-files'],function () {
+  browserSync({
+    open: false,
+    notify: false,
+    server: {
+      baseDir: "deploy",
+      middleware: function(req, res, next) {
+        if(/\S\.{1}(jpg|jpeg|png|svg|css|js|map|ttf|eot|woff|html)/.test(req.url) !== true){
+          req.url = '/index.html';
+        }
+        return next();
+      }
+    }
+  });
 });
 
 // Build production files, the default task
