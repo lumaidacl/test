@@ -89,6 +89,7 @@ gulp.task('deploy-files', ['clean'],function () {
     .pipe($.size({title: 'copy'}))
     .pipe($.if('**/*.css', $.csso()))
     .pipe($.if('**/*.js', $.uglify({preserveComments: 'some'})))
+    .pipe($.if('*.html', $.minifyHtml()))
     .pipe(gulp.dest(config.deploy.to));
 });
 
