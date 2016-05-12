@@ -3,9 +3,6 @@
 	{
 		"js" :
 		{
-			"sources" : [
-				"app/static/js/*.js"
-			],
 			"jsHintReporter" : "jshint-stylish",
 			"tmpDirectory" : ".temporal/app",
 			"entry": "client/app/entry.js"
