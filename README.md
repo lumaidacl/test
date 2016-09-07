@@ -17,7 +17,6 @@ The configuration of the paths are in the file `config.json`
 - Npm
 
 ## How to use?
-
 - Clone the repository
 - Install gulp globally: `npm install gulp -g`
 - Install dependencies for the project: `npm install`

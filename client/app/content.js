@@ -1,1 +1,3 @@
-module.exports = "From content.js";
+document.addEventListener("DOMContentLoaded", function(event) {
+	console.log("Hi there! :)")
+});

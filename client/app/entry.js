@@ -1,3 +1,1 @@
-console.log(require('./content.js'));
-
-// require('./jquery.js')
+require('./content.js');
