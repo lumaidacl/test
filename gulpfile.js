@@ -1,115 +1,70 @@
 var gulp = require('gulp'),
-    gulpPlugins = require('gulp-load-plugins')(),
-    runSequence = require('run-sequence'),
-    browserSync = require('browser-sync'),
-    del = require('del'),
-    config = require('./config.json'),
-    reload = browserSync.reload,
-    webpack = require('webpack-stream'),
-    $ = gulpPlugins,
-    AUTOPREFIXER_BROWSERS = [
-      'ie >= 10',
-      'ie_mob >= 10',
-      'ff >= 30',
-      'chrome >= 34',
-      'safari >= 7',
-      'opera >= 23',
-      'ios >= 7',
-      'android >= 4.4',
-      'bb >= 10'
-    ];
+  gulpPlugins = require('gulp-load-plugins'),
+  runSequence = require('run-sequence'),
+  browserSync = require('browser-sync'),
+  del = require('del'),
+  config = require('./config.json'),
+  reload = browserSync.reload,
+  webpack = require('webpack-stream'),
+  $ = gulpPlugins(),
+  AUTOPREFIXER_BROWSERS = [
+    'ie >= 10',
+    'ie_mob >= 10',
+    'ff >= 30',
+    'chrome >= 34',
+    'safari >= 7',
+    'opera >= 23',
+    'ios >= 7',
+    'android >= 4.4',
+    'bb >= 10'
+  ];
 
 gulp.task('clean', function(){
-    return del(config.files.cleanPaths);
+    return del([ 'deploy/*', '.temporal' ]);
 });
 
-gulp.task('jshint', function () {
-  return gulp.src( config.app.js.sources )
-    .pipe(reload({stream: true, once: true}))
-    .pipe($.jshint())
-    .pipe($.jshint.reporter(config.app.js.jsHintReporter))
-    .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
-});
-
-gulp.task('styles', ['clean'],function () {
-  return gulp.src(config.app.css.entry)
-    .pipe($.sourcemaps.init())
+gulp.task('styles', function() {
+  return gulp.src(config.projectDirectory + '/' + config.cssBundle)
+    .pipe($.sourcemaps.init({debug: true}))
     .pipe($.stylus())
     .pipe($.autoprefixer({browsers: AUTOPREFIXER_BROWSERS}))
-    .pipe($.sourcemaps.write())
-    .pipe(gulp.dest(config.app.css.tmpDirectory))
+    .pipe($.sourcemaps.write('.'))
+    .pipe(gulp.dest('.temporal/' + config.cssDirectory))
     .pipe($.size({title: 'Styles'}));
 });
 
 gulp.task('webpack', function() {
-  return gulp.src(config.app.js.entry)
-          .pipe(webpack({
-            output: {
-              filename: 'bundle.js'
-            },
-            devtool: 'source-map'
-          }))
-          .pipe(gulp.dest(config.app.js.tmpDirectory));
+  return gulp.src(config.projectDirectory + '/' + config.jsRawBundle)
+    .pipe(webpack({
+      output: {
+        filename: config.jsBundle
+      },
+      devtool: 'source-map'
+    }))
+    .pipe(gulp.dest('.temporal/' + config.jsDirectory));
 });
 
-gulp.task('concat-css', function(){
-  return gulp.src(config.files.concat.css)
-    .pipe($.changed(config.app.css.tmpDirectory, {extension: '.css'}))
-    .pipe($.if('*.css', $.concat( config.app.css.concat )))
-    .pipe($.if('*.css', gulp.dest(config.app.css.tmpDirectory)))
-    .pipe($.size({title: 'Concat CSS size'}));
-});
-
-gulp.task('server', ['styles','webpack','clean'], function () {
+gulp.task('serve', [ 'styles', 'webpack' ], function() {
   browserSync({
     open: false,
     notify: false,
     logPrefix: 'Initial Layout',
     server: {
-      baseDir: config.app.server,
+      baseDir: [ '.temporal', config.projectDirectory ],
+      // Middleware for SPA
       middleware: function(req, res, next) {
-        if(/\S\.{1}(jpg|jpeg|png|svg|css|js|map|ttf|eot|woff|html)/.test(req.url) !== true){
-          req.url = '/index.html';
+        if( config.spa ) {
+          if(/\S\.{1}(jpg|jpeg|png|svg|css|js|map|ttf|eot|woff|html)/.test(req.url) !== true){
+            req.url = '/index.html';
+          }
         }
         return next();
       }
     }
   });
 
-  gulp.watch(config.files.watch.html, reload);
-  gulp.watch(config.files.watch.styles, ['styles', reload]);
-  gulp.watch(config.files.watch.js, ['jshint', 'webpack',reload]);
-  gulp.watch(config.files.watch.img, reload);
-});
-
-gulp.task('deploy-files', ['clean'],function () {
-  return gulp.src(config.deploy.from, {
-    dot: true
-  }).pipe(gulp.dest(config.deploy.to))
-    .pipe($.size({title: 'copy'}))
-    .pipe($.if('**/*.css', $.csso()))
-    .pipe($.if('**/*.js', $.uglify({preserveComments: 'some'})))
-    .pipe($.if('*.html', $.minifyHtml()))
-    .pipe(gulp.dest(config.deploy.to));
-});
-
-gulp.task('server:deploy', ['deploy-files'],function () {
-  browserSync({
-    open: false,
-    notify: false,
-    server: {
-      baseDir: "deploy",
-      middleware: function(req, res, next) {
-        if(/\S\.{1}(jpg|jpeg|png|svg|css|js|map|ttf|eot|woff|html)/.test(req.url) !== true){
-          req.url = '/index.html';
-        }
-        return next();
-      }
-    }
-  });
-});
-
-// Build production files, the default task
-gulp.task('default', ['clean'], function (cb) {
-  runSequence('styles', ['jshint','deploy'], cb);
+  gulp.watch(config.projectDirectory + '/**/*.html', reload);
+  gulp.watch(config.projectDirectory + '/**/*.{styl,css}', ['styles', reload]);
+  gulp.watch(config.projectDirectory + '/**/*.js', ['webpack',reload]);
+  gulp.watch(config.projectDirectory + '/**/*.{jpg,jpeg,png,gif}', reload);
 });

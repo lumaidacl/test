@@ -1,9 +1,9 @@
 {
   "name": "initial-layout",
-  "version": "1.1.1",
+  "version": "1.7.0",
   "description": "Initial layout using a lot of tools for web development",
   "scripts": {
-    "start": "gulp server"
+    "start": "gulp serve"
   },
   "keywords": [
     "gulp",

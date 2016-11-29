@@ -1,6 +1,38 @@
 @import '_normalize'
 
+
 body
-  background-color black
-  color yellow
-  font-family 'Roboto', sans-serif
+  font-family: 'Roboto Mono', monospace;
+
+.wrapper
+  align-items center
+  display flex
+  height 100vh
+  justify-content center
+
+.content
+  font-size 2em
+  min-width 500px
+
+// The following style coming from http://www.mattboldt.com/demos/typed-js/
+.typed-cursor{
+  opacity: 1;
+  -webkit-animation: blink 0.7s infinite;
+  -moz-animation: blink 0.7s infinite;
+  animation: blink 0.7s infinite;
+}
+@keyframes blink{
+  0% { opacity:1; }
+  50% { opacity:0; }
+  100% { opacity:1; }
+}
+@-webkit-keyframes blink{
+  0% { opacity:1; }
+  50% { opacity:0; }
+  100% { opacity:1; }
+}
+@-moz-keyframes blink{
+  0% { opacity:1; }
+  50% { opacity:0; }
+  100% { opacity:1; }
+}
