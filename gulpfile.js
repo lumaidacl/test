@@ -19,21 +19,16 @@ var gulp = require('gulp'),
     'bb >= 10'
   ];
 
-gulp.task('clean', function(){
-    return del([ 'deploy/*', '.temporal' ]);
-});
-
-gulp.task('styles', function() {
-  return gulp.src(config.projectDirectory + '/' + config.cssBundle)
+gulp.task('build-styles', function() {
+  return gulp.src(config.projectDirectory + '/' + config.cssRawBundle)
     .pipe($.sourcemaps.init({debug: true}))
     .pipe($.stylus())
     .pipe($.autoprefixer({browsers: AUTOPREFIXER_BROWSERS}))
     .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest('.temporal/' + config.cssDirectory))
-    .pipe($.size({title: 'Styles'}));
+    .pipe(gulp.dest('.temporal/' + config.cssDirectory));
 });
 
-gulp.task('webpack', function() {
+gulp.task('build-scripts', function() {
   return gulp.src(config.projectDirectory + '/' + config.jsRawBundle)
     .pipe(webpack({
       output: {
@@ -44,7 +39,7 @@ gulp.task('webpack', function() {
     .pipe(gulp.dest('.temporal/' + config.jsDirectory));
 });
 
-gulp.task('serve', [ 'styles', 'webpack' ], function() {
+gulp.task('serve', [ 'build-styles', 'build-scripts' ], function() {
   browserSync({
     open: false,
     notify: false,
@@ -64,7 +59,27 @@ gulp.task('serve', [ 'styles', 'webpack' ], function() {
   });
 
   gulp.watch(config.projectDirectory + '/**/*.html', reload);
-  gulp.watch(config.projectDirectory + '/**/*.{styl,css}', ['styles', reload]);
-  gulp.watch(config.projectDirectory + '/**/*.js', ['webpack',reload]);
+  gulp.watch(config.projectDirectory + '/**/*.{styl,css}', ['build-styles', reload]);
+  gulp.watch(config.projectDirectory + '/**/*.js', ['build-scripts',reload]);
   gulp.watch(config.projectDirectory + '/**/*.{jpg,jpeg,png,gif}', reload);
+});
+
+gulp.task('build', [ 'default', 'build-styles', 'build-scripts' ], function() {
+  return gulp.src([ '.temporal/**',
+      config.projectDirectory + '/**',
+      '!' + config.projectDirectory + '/' + config.cssDirectory + '/**',
+      '!' + config.projectDirectory + '/' + config.jsDirectory + '/**'
+    ])
+    .pipe(gulp.dest('build'))
+    .pipe($.if('*.css', $.csso() ))
+    .pipe($.if('*.js', $.uglify() ))
+    .pipe(gulp.dest('build'));
+});
+
+gulp.task('clean', function(){
+    return del([ 'build/*', '.temporal/*' ]);
+});
+
+gulp.task('default', ['clean'], function() {
+  runSequence( 'build-styles', 'build-scripts' );
 });

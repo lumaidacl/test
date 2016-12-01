@@ -2,7 +2,7 @@
 	"spa" : true,
 	"projectDirectory" : "client",
 	"cssDirectory" : "css",
-	"cssBundle" : "css/main.styl",
+	"cssRawBundle" : "css/main.styl",
 	"jsDirectory" : "app",
 	"jsRawBundle" : "app/entry.js",
 	"jsBundle" : "bundle.js"
