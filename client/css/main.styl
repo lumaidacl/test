@@ -2,39 +2,45 @@
 
 body
   font-family: 'Roboto Mono', monospace;
-
-.wrapper
-  align-items center
-  display flex
-  height 100vh
-  justify-content center
-
-.content
-  font-size 2em
-  min-width 500px
-
-::selection
-  background yellow
-
-// The following style coming from http://www.mattboldt.com/demos/typed-js/
-.typed-cursor{
-  opacity: 1;
-  -webkit-animation: blink 0.7s infinite;
-  -moz-animation: blink 0.7s infinite;
-  animation: blink 0.7s infinite;
-}
-@keyframes blink{
-  0% { opacity:1; }
-  50% { opacity:0; }
-  100% { opacity:1; }
-}
-@-webkit-keyframes blink{
-  0% { opacity:1; }
-  50% { opacity:0; }
-  100% { opacity:1; }
-}
-@-moz-keyframes blink{
-  0% { opacity:1; }
-  50% { opacity:0; }
-  100% { opacity:1; }
-}
+.resume-post
+  margin 3em 0
+  border 1px solid _black
+  max-width 520px
+  margin 0 0 60px 0
+  margin-left auto
+  margin-right auto
+  &__link
+    display block
+    text-decoration none
+    display flex
+  &__image
+    // overflow hidden
+    text-align center
+    &--element
+      flex-grow 1
+  &__box
+    max-width 60%
+  &__title
+    color _black
+    text-align center
+    font-size 1.7em
+    text-transform uppercase
+    margin 0
+  &__text
+    color gray
+    text-align center
+  &__button
+    position relative
+    width 180px
+    height 40px
+    padding 0
+    border 4px solid black
+  &__linkin
+    text-decoration none
+    text-transform uppercase
+    span
+      position relative
+      z-index 1
+@media only screen and (min-width: 720px)
+  .resume-post
+    flex-direction row

@@ -6,13 +6,21 @@
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
 </head>
 <body>
-
-	<div class="wrapper">
+	<!-- 	<div class="wrapper">
 		<div class="content">
 			<span class="welcome"></span>
-		</div>		
-	</div>
-
+		</div>
+	</div> -->
+	<article class="street-post">
+	  <a ng-href="street-style/{{ $ctrl.streetStyle.slug }}" class="street-post__link">
+	    <h2 class="street-post__title">
+	      {{ $ctrl.streetStyle.title }}
+	    </h2>
+	    <picture class="street-post__image" >
+	      <img ng-src="{{ $ctrl.streetStyle.mainImage }}" alt="{{ $ctrl.streetStyle.title }}" >
+	    </picture>
+	  </a>
+	</article>
 	<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/1.1.4/typed.min.js" ></script>
 	<script type="text/javascript" src="app/bundle.js" ></script>
